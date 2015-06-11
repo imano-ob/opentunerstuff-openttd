@@ -1,0 +1,5 @@
+opentuner.db
+opentuner.log
+adddeps.py
+*.pyc
+*~
