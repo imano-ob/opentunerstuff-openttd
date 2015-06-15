@@ -4,6 +4,9 @@ import threading
 import sys
 
 class TTDHandler():
+    def __init__(self):
+        self.lock = threading.Lock()
+    
     def start(self):
         print "gonna start"
         self.server = subprocess.Popen(["openttd", "-D"],
@@ -14,8 +17,10 @@ class TTDHandler():
         
     def add_ai(self, ai):
         #ignore ai for now
-        print "hurrrrrr"
+        self.lock.acquire()
+        print threading.activeCount()
         self.server.stdin.write("start_ai\n")
+        self.lock.release()
 
     def shutdown(self):
         self.server.stdin.write("quit")
