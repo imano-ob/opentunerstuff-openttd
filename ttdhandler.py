@@ -5,7 +5,14 @@ import sys
 import time
 
 class TTDHandler():
-    def __init__(self):
+    def __init__(self,
+                 max_ais = 16,
+                 ais_per_round = 16):
+        self.max_ais = max_ais
+        #Not currenly used
+        self.ais_per_round = ais_per_round
+
+        self.ai_sem = threading.Semaphore(self.max_ais)
         self.server_in_lock = threading.Lock()
         self.server_out_locks = {}
         self.server_in_locks = {}
@@ -21,6 +28,8 @@ class TTDHandler():
                 
     def add_ai(self, ai, ai_id):
 
+        self.ai_sem.acquire()
+        
         #management stuff
         self.server_out_locks[ai_id] = threading.Lock()
         self.server_in_locks[ai_id] = threading.Lock()
@@ -28,8 +37,16 @@ class TTDHandler():
         #server communication
         self.server_in_lock.acquire()   
         self.server.stdin.write("start_ai {}\n".format(ai))
+        #TODO: pegar id na ai no openttd?
         self.server_in_lock.release()
 
+    def stop_ai(self, ai_id):
+        self.server_in_lock.acquire()   
+        #self.server.stdin.write("stop_ai {}\n".format(ai))
+        #TODO: Stop AI
+        self.server_in_lock.release()
+        self.ai_sem.release()
+        
     def read_output(self):
         while True:
             last_line = self.server.stdout.readline()
@@ -50,8 +67,16 @@ class TTDHandler():
         #real codez
         #TODO: cleanup
         self.server_in_locks[ai_id].acquire()
-        return self.bufs[ai_id]
+        res = self.bufs[ai_id]
+        self.server_in_locks[ai_id].release()
+
+        self.stop_ai(ai_id)
+        
+        return res
         
     def shutdown(self):
         #TODO: cleanup
+        self.server_in_lock.acquire()   
         self.server.stdin.write("quit\n")
+        self.server_in_lock.release()
+
