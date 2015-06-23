@@ -6,10 +6,11 @@ import time
 
 class TTDHandler():
     def __init__(self,
-                 max_ais = 16,
-                 ais_per_round = 16):
+                 #Maximo 15
+                 max_ais = 8,
+                 ais_per_round = 8):
         self.max_ais = max_ais
-        #Not currenly used
+        #Not currently used
         self.ais_per_round = ais_per_round
 
         self.ai_sem = threading.Semaphore(self.max_ais)
@@ -20,7 +21,8 @@ class TTDHandler():
         
     def start(self):
         self.server = subprocess.Popen(["openttd",
-                                        "-D"],
+                                        "-D",
+                                        "-d 6"],
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
@@ -35,7 +37,9 @@ class TTDHandler():
         self.server_in_locks[ai_id] = threading.Lock()
 
         #server communication
-        self.server_in_lock.acquire()   
+        self.server_in_lock.acquire()
+        #Recarrega AIs para incluir a AI recem gerada
+        self.server.stdin.write("reload_ai")
         self.server.stdin.write("start_ai {}\n".format(ai))
         #TODO: pegar id na ai no openttd?
         self.server_in_lock.release()
@@ -51,6 +55,7 @@ class TTDHandler():
         while True:
             last_line = self.server.stdout.readline()
             ai_id, content = self.parse(last_line)
+            #TODO: arranjar um jeito de lidar com o comando companies do Openttd
             if ai_id == None:
                 continue
             self.server_out_locks[ai_id].acquire()
@@ -59,7 +64,15 @@ class TTDHandler():
             self.bufs[ai_id] = content
             self.server_out_locks[ai_id].release()
             self.server_in_locks[ai_id].release()
-        
+
+    def parse(self, line):
+        #TODO: parsear
+        #AIs: começam com [script]
+        #...huh
+        #São da forma [script][<ID>][<Error/Warning/Info>] <Texto>
+        #Deve dar pra usar isso pra extrair o ID in TTD?
+        pass
+            
     def result(self, ai_id):
         #temp codez
         time.sleep(10)
