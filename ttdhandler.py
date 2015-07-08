@@ -24,16 +24,20 @@ class TTDHandler():
     def start(self):
         self.server = subprocess.Popen(["openttd",
                                         "-D",
-                                        "-d 6"],
+                                        "-d 5"],
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
         self.read_thread = threading.Thread(target = self.read_output)
+        self.read_thread.start()
                 
     def add_ai(self, ai, ai_id):
 
-        self.ai_sem.acquire()
+        print "uno"
         
+        self.ai_sem.acquire()
+
+        print "dos"
         #management stuff
         self.server_out_locks[ai_id] = threading.Lock()
         self.server_in_locks[ai_id] = threading.Lock()
@@ -41,8 +45,15 @@ class TTDHandler():
         #server communication
         self.server_in_lock.acquire()
         #Recarrega AIs para incluir a AI recem gerada
-        self.server.stdin.write("reload_ai")
-        self.server.stdin.write("start_ai {}\n".format(ai))
+        cmd = "rescan_ai\n"
+        print cmd
+        self.server.stdin.write(cmd)
+        cmd = "start_ai {}\n".format(ai)
+        print cmd
+        self.server.stdin.write(cmd)
+
+        print "tres"
+        
         self.server_in_lock.release()
 
     def stop_ai(self, ttd_id):
@@ -52,8 +63,13 @@ class TTDHandler():
         self.ai_sem.release()
         
     def read_output(self):
+        print "asdasdasd"
         while True:
             last_line = self.server.stdout.readline()
+            print last_line
+            if last_line == '':
+                print "ohnoes"
+                break
             ai_id, ttd_id, content = self.parse(last_line)
             if ai_id == None:
                 continue
@@ -68,30 +84,33 @@ class TTDHandler():
         #São da forma [script][<ID>][<Error/Warning/Info>] <Texto>
         #AIs devem ter output da froma [<Tuner ID>][<Resultado>] for
         #simplicity's sake
-        
+        print "in parse"
         tmp = line.split(']')
         for field in tmp:
             field.strip('[')
         if tmp != 'script':
+            print "pointless"
             return None, None, None
         #Campos restantes são irrelevantes para nossos propósitos
+        #TODO: Possivelmente certificar que vai continuar funcionando
+        #no futuro
         ai_id = tmp[3]
         ttd_id = tmp[1]
         content = tmp[4]
+        print "{} {} {}".format(ai_id, ttd_id, content)
 
         return ai_id, ttd_id, content
             
     def result(self, ai_id):
         #temp codez
+        print "Heyoooooooooooooooooooo"
         time.sleep(10)
         return 10
         #real codez
-        #TODO: cleanup
+        #TODO: cleanup de coisas relacionadas à ai que vai morrer
         self.server_in_locks[ai_id].acquire()
         res = self.bufs[ai_id]
         self.server_in_locks[ai_id].release()
-
-        self.stop_ai(ai_id)
         
         return res
         

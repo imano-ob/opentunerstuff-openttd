@@ -44,11 +44,13 @@ class TTDTuner(MeasurementInterface):
     
     def compile(self, cfg, result_id):
         self.handler.add_ai(self.ais[cfg['AI']], result_id)
+        print "hurp {}".format(self.ais[cfg['AI']])
         return 0
     
     def run_precompiled(self, desired_result, input, limit, compile_result,
                         result_id):
         res = self.handler.result(result_id)
+        print "hu3"
         return Result(time = -res)
         
     def run(self, desired_result, input, limit):
