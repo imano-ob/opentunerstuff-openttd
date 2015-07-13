@@ -43,7 +43,7 @@ class TTDTuner(MeasurementInterface):
         self.ais = ['AIAI', 'Convoy', 'CivilAI']
     
     def compile(self, cfg, result_id):
-        self.handler.add_ai(self.ais[cfg['AI']], result_id)
+        self.handler.start_ai(self.ais[cfg['AI']], result_id)
         print "hurp {}".format(self.ais[cfg['AI']])
         return 0
     
