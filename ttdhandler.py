@@ -14,9 +14,8 @@ class TTDHandler():
         self.ais_per_round = ais_per_round
 
         self.server_in_lock = threading.Lock()
-        self.server_out_locks = {}
-        self.server_in_locks = {}
         self.bufs = {}
+        self.result_locks = {}
         
     def start(self):
         self.server = subprocess.Popen(["openttd",
@@ -31,9 +30,8 @@ class TTDHandler():
     def add_ai(self, ai, ai_id):
 
         #management stuff
-        self.server_out_locks[ai_id] = threading.Lock()
-        self.server_in_locks[ai_id] = threading.Lock()
-
+        self.result_locks[ai_id] = threading.Lock()
+        self.result_locks[ai_id].acquire()
         #server communication
         cmd = "rescan_ai"
         self.write_to_server(cmd)
@@ -43,6 +41,8 @@ class TTDHandler():
     def stop_ai(self, ttd_id):
         cmd = "stop_ai {}".format(ttd_id + 1) #reasons
         self.write_to_server(cmd)
+        self.result_locks[ai_id].release()
+
         
     def read_output(self):
         while True:
@@ -53,11 +53,8 @@ class TTDHandler():
             ai_id, ttd_id, content = self.parse(last_line)
             if ai_id == None:
                 continue
-            self.server_out_locks[ai_id].acquire()
             self.bufs[ai_id] = content
             self.stop_ai(ttd_id)
-            self.server_out_locks[ai_id].release()
-            self.server_in_locks[ai_id].release()
 
     def parse(self, line):
         #AIs: começam com [script]
@@ -86,10 +83,14 @@ class TTDHandler():
         return 10
         #real codez
         #TODO: cleanup de coisas relacionadas à ai que vai morrer
-        self.server_in_locks[ai_id].acquire()
-        res = self.bufs[ai_id]
-        self.server_in_locks[ai_id].release()
-        
+
+        self.result_locks[ai_id].acquire()
+        res = self.bufs[ai_id]        
+        self.result_locks[ai_id].release()
+
+        self.bufs[ai_id] = None
+        self.result_locks[ai_id] = None
+
         return res
         
     def shutdown(self):
