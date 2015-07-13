@@ -80,7 +80,7 @@ class TTDHandler():
         tmp = line.split(']')
         for field in tmp:
             field.strip('[')
-        if tmp != 'script':
+        if tmp != 'script' or len(tmp) < 5:
             return None, None, None
         #Campos restantes são irrelevantes para nossos propósitos
         #TODO: Possivelmente certificar que vai continuar funcionando
