@@ -1,4 +1,6 @@
 
+import shutil
+
 class AIBuilder:
     def __init__(self):
         self.base_ai_directory = None #./base_ai
@@ -6,10 +8,19 @@ class AIBuilder:
         self.cost_file = None #base_directory/pathfinder.nut
         self.info_file = None #base_directory/info.nut
         self.main_file = None #base_directory/main.nut
+        #Talvez limpeza?
         
     def build(self, args, ai_id):
-        #Isso vai copiar coisas a serem reescritas depois
-        #filesystem.copy(from base, to ai dir, lotsastuff)
+        #Isso vai copiar inclusive coisas a serem reescritas depois
+        #TODO: tratar erros
+        try:
+            shutil.copytree(self.base_ai_directory, self.destiny_ai_directory)
+        except OSError as e:
+            #Error 17: arquivo já existe
+            #Não vamos tratar caso seja outro erro
+            if e.errno != 17:
+                raise
+            #TODO: arranjar alguma coisa pra resolver esse caso
         #TODO: tratar args
         arg_string = self.build_arg_string(args)
         self.substitute(self.cost_file, arg_string)
