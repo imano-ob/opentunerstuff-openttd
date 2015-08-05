@@ -20,16 +20,22 @@ class TTDHandler():
         self.server_in_lock = threading.Lock()
         self.bufs = {}
         self.result_locks = {}
+        self.running = False
         
     def start(self, args = ["openttd",
                             "-D",
                             "-d 5"]):
+        if self.running:
+            #OhNoes!
+            #construir exceção/retornar algo?
+            raise
         self.server = subprocess.Popen(args,
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
         self.read_thread = threading.Thread(target = self.read_output)
         self.read_thread.start()
+        self.running = True
                 
     def start_ai(self, ai, ai_id):
 
@@ -112,6 +118,7 @@ class TTDHandler():
     def shutdown(self):
         #TODO: cleanup
         self.write_to_server("quit")
+        self.running = False
 
     def reset_server(self):
         self.write_to_server("restart")
