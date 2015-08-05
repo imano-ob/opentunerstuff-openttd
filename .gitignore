@@ -3,3 +3,4 @@ opentuner.log
 adddeps.py
 *.pyc
 *~
+config.py

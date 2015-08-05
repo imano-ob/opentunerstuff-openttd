@@ -1,0 +1,5 @@
+
+#Arrumar abaixo para seu sistema e copiar para config.py
+
+base_dir = '/home/joao/pizza'
+target_dir = 'c:/pizza'
