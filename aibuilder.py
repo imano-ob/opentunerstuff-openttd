@@ -10,7 +10,7 @@ class AIBuilder:
         self.cost_file = 'costs.nut' #base_directory/pathfinder.nut
         self.info_file = 'info.nut' #base_directory/info.nut
         self.main_file = 'main.nut' #base_directory/main.nut
-        #Talvez limpeza?
+        self.base_name = 'test_ai'
         
     def build(self, args, ai_id):
         #Isso vai copiar inclusive coisas a serem reescritas depois
@@ -23,11 +23,12 @@ class AIBuilder:
             if e.errno != 17:
                 raise
             #TODO: arranjar alguma coisa pra resolver esse caso
+            raise
         #TODO: tratar args
         arg_string = self.build_arg_string(args)
         self.substitute(self.cost_file, arg_string)
         
-        #TODO: geram ai_name
+        ai_name = self.base_name + str(ai_id)
         self.substitute(self.info_file, ai_name)
         self.substitute(self.main_file, ai_name)
         
