@@ -7,7 +7,7 @@ class AIBuilder:
         self.base_dir = config.base_dir #./base_ai
         self.target_dir = config.target_dir #~/.openttd/ai
         #TODO: definir e/ou verificar coisas abaixo
-        self.cost_file = 'costs.nut' #base_directory/pathfinder.nut
+        self.cost_file = 'pathfinder.nut' #base_directory/pathfinder.nut
         self.info_file = 'info.nut' #base_directory/info.nut
         self.main_file = 'main.nut' #base_directory/main.nut
         self.base_name = 'test_ai'
@@ -48,5 +48,17 @@ class AIBuilder:
         target_file.close()
         
     def build_arg_string(self, args):
-        #too lazy
-        pass
+        str = ""
+        str += "this._max_cost = {};".format(args['MAX_COST'])
+        str += "this._cost_tile = {};".format(args['COST_TILE'])
+	str += "this._cost_diagonal_tile = {};".format(args['COST_DIAGONAL'])
+	str += "this._cost_turn = {};".format(args['COST_TURN'])
+	str += "this._cost_slope = {};".format(args['COST_SLOPE'])
+	str += "this._cost_bridge_per_tile = {};".format(args['COST_BRIDGE'])
+	str += "this._cost_tunnel_per_tile = {};".format(args['COST_TUNNEL'])
+	str += "this._cost_coast = {};".format(args['COST_COAST'])
+	str += "this._cost_no_adj_rail = {};".format(args['COST_NO_ADJ_RAIL'])
+	str += "this._cost_adj_obstacle = {};".format(args['COST_ADJ_OBST'])
+	str += "this._max_bridge_length = {};".format(args['MAX_BRIDGE_LEN'])
+        str += "this._max_tunnel_length = {};".format(args['MAX_TUNNEL_LEN'])
+        return str
