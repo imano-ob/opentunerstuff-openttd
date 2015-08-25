@@ -29,8 +29,11 @@ class AIBuilder:
         self.substitute(self.cost_file, arg_string)
         
         ai_name = self.base_name + str(ai_id)
-        self.substitute(self.info_file, ai_name)
-        self.substitute(self.main_file, ai_name)
+        str = '	function GetName()        { return "{}"; }
+	function CreateInstance() { return "{}"; }'.format(ai_name, ai_name)
+        self.substitute(self.info_file, str)
+        str = 'AICompany.SetName("{}");'.format(ai_name)
+        self.substitute(self.main_file, str)
         
     def substitute(self, target_file, content):
         base_path = self.base_dir + target_file
