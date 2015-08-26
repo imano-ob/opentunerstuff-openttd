@@ -59,17 +59,17 @@ class AIBuilder:
     def build_arg_string(self, args):
         str = ""
         #temp
-        return ""
-        str += "this._max_cost = {};".format(args['MAX_COST'])
-        str += "this._cost_tile = {};".format(args['COST_TILE'])
-	str += "this._cost_diagonal_tile = {};".format(args['COST_DIAGONAL'])
-	str += "this._cost_turn = {};".format(args['COST_TURN'])
-	str += "this._cost_slope = {};".format(args['COST_SLOPE'])
-	str += "this._cost_bridge_per_tile = {};".format(args['COST_BRIDGE'])
-	str += "this._cost_tunnel_per_tile = {};".format(args['COST_TUNNEL'])
-	str += "this._cost_coast = {};".format(args['COST_COAST'])
-	str += "this._cost_no_adj_rail = {};".format(args['COST_NO_ADJ_RAIL'])
-	str += "this._cost_adj_obstacle = {};".format(args['COST_ADJ_OBST'])
-	str += "this._max_bridge_length = {};".format(args['MAX_BRIDGE_LEN'])
-        str += "this._max_tunnel_length = {};".format(args['MAX_TUNNEL_LEN'])
+#        return ""
+        str += "this._max_cost = {};\n".format(args['MAX_COST'])
+        str += "this._cost_tile = {};\n".format(args['COST_TILE'])
+	str += "this._cost_diagonal_tile = {};\n".format(args['COST_DIAGONAL'])
+	str += "this._cost_turn = {};\n".format(args['COST_TURN'])
+	str += "this._cost_slope = {};\n".format(args['COST_SLOPE'])
+	str += "this._cost_bridge_per_tile = {};\n".format(args['COST_BRIDGE'])
+	str += "this._cost_tunnel_per_tile = {};\n".format(args['COST_TUNNEL'])
+	str += "this._cost_coast = {};\n".format(args['COST_COAST'])
+	str += "this._cost_no_adj_rail = {};\n".format(args['COST_NO_ADJ_RAIL'])
+	str += "this._cost_adj_obstacle = {};\n".format(args['COST_ADJ_OBST'])
+	str += "this._max_bridge_length = {};\n".format(args['MAX_BRIDGE_LEN'])
+        str += "this._max_tunnel_length = {};\n".format(args['MAX_TUNNEL_LEN'])
         return str
