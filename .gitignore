@@ -4,3 +4,4 @@ adddeps.py
 *.pyc
 *~
 config.py
+\#*\#
