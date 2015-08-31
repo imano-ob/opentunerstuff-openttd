@@ -37,8 +37,8 @@ class AIBuilder:
             arg_string = self.build_arg_string(args)
             self.substitute(self.cost_file, arg_string)
             
-            aux = '	function GetName() {return "%s"}\n' % (ai_name)
-            aux +=' function CreateInstance() {return "%s"}"; }\n' % (ai_name)
+            aux = '	function GetName() {return "%s";}\n' % (ai_name)
+            aux +=' function CreateInstance() {return "%s";}" }\n' % (ai_name)
             self.substitute(self.info_file, aux)
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)
             aux += 'local ai_id = {};\n'.format(ai_id)

@@ -28,8 +28,11 @@ enum SignalMode {
 class ChooChoo extends AIController {
 	
 	function Start() {
-		AICompany.SetName("ChooChoo");
-		AICompany.SetAutoRenewStatus(true);
+
+        //For the tuning!
+        changeme
+        
+        AICompany.SetAutoRenewStatus(true);
 		AICompany.SetAutoRenewMonths(0);
 		AICompany.SetAutoRenewMoney(0);
 		
@@ -53,7 +56,10 @@ class ChooChoo extends AIController {
 			// start with some point to point lines
 			tasks.push(Bootstrap());
 		}
-		
+
+        //Inserted stuff for the tuning
+        local beginDate = AIDate.GetCurrentDate();
+
 		local minMoney = 0;
 		while (true) {
 			HandleEvents();
@@ -92,6 +98,15 @@ class ChooChoo extends AIController {
 					return;
 				}
 			}
+        local curDate = AIDate.GetCurrentDate();
+        //yrDiff = AIDate::GetYear(curDate) - AIDate::GetYear(beginDate)
+        //monthDiff = AIDate::GetMonth(curDate) - AIDate::GetMonth(beginDate)
+        //dayDiff = AIDate::GetDay(curDate) - AIDate::GetDay(beginDate)
+        if (curDate - beginDate >= 365){
+               //TODO: arrumar linha abaixo
+               AILog::Info("[" + ai_id + "][" + GetBankBalance()  + "]");
+               beginDate = curDate;
+           }
 		}
 	}
 	

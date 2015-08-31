@@ -35,18 +35,19 @@ class Rail
 	
 	constructor()
 	{
-		this._max_cost = 10000000;
-		this._cost_tile = 100;
-		this._cost_diagonal_tile = 70;
-		this._cost_turn = 50;
-		this._cost_slope = 100;
-		this._cost_bridge_per_tile = 150;
-		this._cost_tunnel_per_tile = 120;
-		this._cost_coast = 20;
-		this._cost_no_adj_rail = 0;
-		this._cost_adj_obstacle = 0;
-		this._max_bridge_length = 6;
-		this._max_tunnel_length = 6;
+//		this._max_cost = 10000000;
+//		this._cost_tile = 100;
+//		this._cost_diagonal_tile = 70;
+//		this._cost_turn = 50;
+//		this._cost_slope = 100;
+//		this._cost_bridge_per_tile = 150;
+//		this._cost_tunnel_per_tile = 120;
+//		this._cost_coast = 20;
+//		this._cost_no_adj_rail = 0;
+//		this._cost_adj_obstacle = 0;
+//		this._max_bridge_length = 6;
+//		this._max_tunnel_length = 6;
+changeme
 		this._pathfinder = this._aystar_class(this._Cost, this._Estimate, this._Neighbours, this._CheckDirection, this, this, this, this);
 
 		this.cost = this.Cost(this);
