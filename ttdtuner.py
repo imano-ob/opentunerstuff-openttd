@@ -38,43 +38,43 @@ class TTDTuner(MeasurementInterface):
     def manipulator(self):
         manipulator = ConfigurationManipulator()
 
-        manipulator.add_paramater(IntegerParameter('MAX_COST',
+        manipulator.add_parameter(IntegerParameter('MAX_COST',
                                                    5000000,
                                                    20000000))
-        manipulator.add_paramater(IntegerParameter('COST_TILE',
+        manipulator.add_parameter(IntegerParameter('COST_TILE',
                                                    50,
                                                    200))
-        manipulator.add_paramater(IntegerParameter('COST_DIAGONAL',
+        manipulator.add_parameter(IntegerParameter('COST_DIAGONAL',
                                                    35,
                                                    140))
-        manipulator.add_paramater(IntegerParameter('COST_TURN',
+        manipulator.add_parameter(IntegerParameter('COST_TURN',
                                                    25,
                                                    100))
-        manipulator.add_paramater(IntegerParameter('COST_TURN',
+        manipulator.add_parameter(IntegerParameter('COST_TURN',
                                                    25,
                                                    100))
-        manipulator.add_paramater(IntegerParameter('COST_SLOPE',
+        manipulator.add_parameter(IntegerParameter('COST_SLOPE',
                                                    50,
                                                    200))
-        manipulator.add_paramater(IntegerParameter('COST_BRIDGE',
+        manipulator.add_parameter(IntegerParameter('COST_BRIDGE',
                                                    75,
                                                    300))
-        manipulator.add_paramater(IntegerParameter('COST_TUNNEL',
+        manipulator.add_parameter(IntegerParameter('COST_TUNNEL',
                                                    60,
                                                    240))
-        manipulator.add_paramater(IntegerParameter('COST_COAST',
+        manipulator.add_parameter(IntegerParameter('COST_COAST',
                                                    10,
                                                    40))
-        manipulator.add_paramater(IntegerParameter('COST_NO_ADJ_RAIL',
+        manipulator.add_parameter(IntegerParameter('COST_NO_ADJ_RAIL',
                                                    0,
                                                    100))
-        manipulator.add_paramater(IntegerParameter('COST_ADJ_OBST',
+        manipulator.add_parameter(IntegerParameter('COST_ADJ_OBST',
                                                    0,
                                                    100))
-        manipulator.add_paramater(IntegerParameter('MAX_BRIDGE_LEN',
+        manipulator.add_parameter(IntegerParameter('MAX_BRIDGE_LEN',
                                                    3,
                                                    20))
-        manipulator.add_paramater(IntegerParameter('MAX_TUNNEL_LEN',
+        manipulator.add_parameter(IntegerParameter('MAX_TUNNEL_LEN',
                                                    3,
                                                    20))
 
@@ -105,7 +105,9 @@ class TTDTuner(MeasurementInterface):
         result_id = self.cur_id
         self.cur_id += 1
         self.idlock.release()
-        self.handler.start_ai(self.ais[cfg['AI']], result_id)
+        cfg = desired_result.configuration.data
+        ai_name = self.builder.build(cfg, result_id)
+        self.handler.start_ai(ai_name, result_id)
         res = self.handler.result(result_id)
         return Result(time = -res)
     
