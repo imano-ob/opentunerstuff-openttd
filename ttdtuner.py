@@ -113,7 +113,8 @@ class TTDTuner(MeasurementInterface):
     
     def save_final_config(self, configuration):
         self.handler.shutdown()
-
+        self.manipulator().save_to_file(configuration.data,
+                                        'ttd_final_config.json')
 
     
 if __name__ == '__main__':
