@@ -45,6 +45,7 @@ class AIBuilder:
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)
             aux += 'local ai_id = {};\n'.format(ai_id)
             self.substitute(target_dir, self.main_file, aux)
+            return ai_name
         
     def substitute(self, target_dir, target_file, content):
         base_path = self.base_dir + '/' + target_file

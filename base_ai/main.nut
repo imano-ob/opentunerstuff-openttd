@@ -59,7 +59,7 @@ class ChooChoo extends AIController {
 
         //Inserted stuff for the tuning
         local beginDate = AIDate.GetCurrentDate();
-
+        Debug("Starting CHOO")
 		local minMoney = 0;
 		while (true) {
 			HandleEvents();

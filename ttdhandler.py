@@ -131,6 +131,7 @@ class TTDHandler():
         #Coderproofing
         msg += '\n'
         self.server_in_lock.acquire()
+        print('to server ->' + msg)
         self.server.stdin.write(msg)
         time.sleep(sleep_time)
         self.server_in_lock.release()

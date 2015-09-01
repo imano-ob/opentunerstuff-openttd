@@ -107,6 +107,7 @@ class TTDTuner(MeasurementInterface):
         self.idlock.release()
         cfg = desired_result.configuration.data
         ai_name = self.builder.build(cfg, result_id)
+        print('ai name ->' + ai_name)
         self.handler.start_ai(ai_name, result_id)
         res = self.handler.result(result_id)
         return Result(time = -res)
