@@ -100,9 +100,9 @@ class TTDHandler():
             
     def result(self, ai_id):
         #temp codez
-        print "Heyoooooooooooooooooooo"
-        time.sleep(100)
-        return 10
+#        print "Heyoooooooooooooooooooo"
+#        time.sleep(100)
+#        return 10
         #real codez
         #TODO: cleanup de coisas relacionadas à ai que vai morrer
 
