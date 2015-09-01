@@ -59,7 +59,7 @@ class ChooChoo extends AIController {
 
         //Inserted stuff for the tuning
         local beginDate = AIDate.GetCurrentDate();
-        Debug("Starting CHOO")
+        Debug("Starting CHOO");
 		local minMoney = 0;
 		while (true) {
 			HandleEvents();
@@ -99,12 +99,14 @@ class ChooChoo extends AIController {
 				}
 			}
         local curDate = AIDate.GetCurrentDate();
-        //yrDiff = AIDate::GetYear(curDate) - AIDate::GetYear(beginDate)
-        //monthDiff = AIDate::GetMonth(curDate) - AIDate::GetMonth(beginDate)
-        //dayDiff = AIDate::GetDay(curDate) - AIDate::GetDay(beginDate)
         if (curDate - beginDate >= 365){
-               //TODO: arrumar linha abaixo
-               AILog::Info("[" + ai_id + "][" + GetBankBalance()  + "]");
+               local msg = "[";
+               msg = msg + ai_id;
+               msg = msg + "][";
+               msg = msg + GetBankBalance();
+               msg = msg + "]";  
+//               AILog::Info("[" + ai_id + "][" + GetBankBalance()  + "]");
+               Info(msg);
                beginDate = curDate;
            }
 		}
