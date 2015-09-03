@@ -21,6 +21,7 @@ class TTDHandler():
         self.bufs = {}
         self.result_locks = {}
         self.running = False
+        self.wait_lock = threading.Lock()
         
     def start(self, args = ["openttd",
                             "-D",
@@ -34,7 +35,10 @@ class TTDHandler():
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
         self.read_thread = threading.Thread(target = self.read_output)
+        self.wait_lock.acquire()
         self.read_thread.start()
+        self.wait_lock.acquire()
+        self.wait_lock.release()
         self.running = True
                 
     def start_ai(self, ai, ai_id):
@@ -71,7 +75,9 @@ class TTDHandler():
             last_line = self.server.stdout.readline()
             print last_line
             if last_line == '':
-                break
+                return
+            if last_line.find('starting game') != -1:
+                self.wait_lock.release()
             ai_id, ttd_id, content = self.parse(last_line)
             if ai_id == None:
                 continue
@@ -99,11 +105,6 @@ class TTDHandler():
         return ai_id, ttd_id, content
             
     def result(self, ai_id):
-        #temp codez
-#        print "Heyoooooooooooooooooooo"
-#        time.sleep(100)
-#        return 10
-        #real codez
         #TODO: cleanup de coisas relacionadas à ai que vai morrer
 
         self.result_locks[ai_id].acquire()
@@ -121,7 +122,10 @@ class TTDHandler():
         self.running = False
 
     def reset_server(self):
+        self.wait_lock.acquire()
         self.write_to_server("restart")
+        self.wait_lock.acquire()
+        self.wait_lock.release()
         self.started_ais = 0
         self.active_ais = 0
         self.add_ai_lock.release()
