@@ -29,14 +29,13 @@ class AIBuilder:
             #TODO: arranjar alguma coisa pra resolver esse caso
             shutil.rmtree(target_dir)
             shutil.copytree(self.base_dir, target_dir)
-        #TODO: tratar args
         finally:
 
             arg_string = self.build_arg_string(args)
             self.substitute(target_dir, self.cost_file, arg_string)
             
             aux = '	function GetName() {return "%s";}\n' % (ai_name)
-            aux +=' function CreateInstance() {return "%s";} \n' % (ai_name)
+#            aux +=' function CreateInstance() {return "%s";} \n' % (ai_name)
             self.substitute(target_dir, self.info_file, aux)
 
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)

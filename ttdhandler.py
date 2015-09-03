@@ -100,7 +100,7 @@ class TTDHandler():
         ai_id = tmp[3]
         ttd_id = tmp[1]
         content = tmp[4]
-        print "{} {} {}".format(ai_id, ttd_id, content)
+        print "handler leu -> {} {} {}".format(ai_id, ttd_id, content)
 
         return ai_id, ttd_id, content
             
