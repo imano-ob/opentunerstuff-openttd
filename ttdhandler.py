@@ -92,11 +92,13 @@ class TTDHandler():
         tmp = line.split(']')
         for field in tmp:
             field.strip('[')
-        if tmp[1] != 'script' or len(tmp) < 5:
+        if len(tmp) < 6 or tmp[1] != 'script' or tmp[3] != 'tuner':
             return None, None, None
         #Campos restantes são irrelevantes para nossos propósitos
         #TODO: Possivelmente certificar que vai continuar funcionando
         #no futuro
+        for i in tmp:
+            print str(i) + ' -> ' + tmp[i]
         ai_id = tmp[4]
         ttd_id = tmp[2]
         content = tmp[5]
