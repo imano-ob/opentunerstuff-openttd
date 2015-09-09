@@ -25,7 +25,7 @@ class TTDHandler():
         
     def start(self, args = ["openttd",
                             "-D",
-                            "-d 5"]):
+                            "-d script 5"]):
         if self.running:
             #OhNoes!
             #construir exceção/retornar algo?
@@ -92,14 +92,14 @@ class TTDHandler():
         tmp = line.split(']')
         for field in tmp:
             field.strip('[')
-        if tmp != 'script' or len(tmp) < 5:
+        if tmp[1] != 'script' or len(tmp) < 5:
             return None, None, None
         #Campos restantes são irrelevantes para nossos propósitos
         #TODO: Possivelmente certificar que vai continuar funcionando
         #no futuro
-        ai_id = tmp[3]
-        ttd_id = tmp[1]
-        content = tmp[4]
+        ai_id = tmp[4]
+        ttd_id = tmp[2]
+        content = tmp[5]
         print "handler leu -> {} {} {}".format(ai_id, ttd_id, content)
 
         return ai_id, ttd_id, content
