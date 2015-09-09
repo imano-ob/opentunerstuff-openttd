@@ -30,7 +30,7 @@ tune-mainclassname
 //class ChooChoo extends AIController {
 	
 	function Start() {
-
+        AILog.Info("Starting the Choo!");
         //For the tuning!
         changeme
         
@@ -108,7 +108,7 @@ tune-mainclassname
                msg = msg + GetBankBalance();
                msg = msg + "]";  
 //               AILog::Info("[" + ai_id + "][" + GetBankBalance()  + "]");
-               Info(msg);
+               Debug(msg);
                beginDate = curDate;
            }
 		}

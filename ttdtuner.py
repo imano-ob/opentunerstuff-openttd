@@ -1,4 +1,6 @@
 
+# -*- coding: UTF-8 -*-
+
 import adddeps
 
 import opentuner
@@ -25,7 +27,7 @@ class TTDTuner(MeasurementInterface):
         self.parallel_compile = True
         self.handler = ttdhandler.TTDHandler()
         self.handler.start()
-        time.sleep(3)
+#        time.sleep(3)
 
         self.builder = aibuilder.AIBuilder()
         
@@ -77,18 +79,11 @@ class TTDTuner(MeasurementInterface):
         manipulator.add_parameter(IntegerParameter('MAX_TUNNEL_LEN',
                                                    3,
                                                    20))
-
-
-
-        
- #       manipulator.add_parameter(SwitchParameter('AI', 3))
-
-#        self.set_ais()
-        
+       
         return manipulator
 
-#    def set_ais(self):
-#        self.ais = ['AIAI', 'Convoy', 'CivilAI']
+#TODO: gerar nome de AI para ser unico de acordo com cfg e usar compile?
+#ou não vale o esforço?
     
 #    def compile(self, cfg, result_id):
 #        self.handler.start_ai(self.ais[cfg['AI']], result_id)
@@ -97,7 +92,6 @@ class TTDTuner(MeasurementInterface):
 #    def run_precompiled(self, desired_result, input, limit, compile_result,
 #                        result_id):
 #        res = self.handler.result(result_id)
-#        print "hu3"
 #        return Result(time = -res)
         
     def run(self, desired_result, input, limit):
