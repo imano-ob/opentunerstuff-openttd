@@ -36,18 +36,21 @@ class AIBuilder:
         finally:
 
             arg_string = self.build_arg_string(args)
-            self.substitute(target_dir, self.cost_file, arg_string)
+            replacement_dict = {'changeme': arg_string}
+            self.substitute(target_dir, self.cost_file, replacement_dict)
             
             aux = '	function GetName() {return "%s";}\n' % (ai_name)
             aux +=' function CreateInstance() {return "%s";} \n' % (ai_name)
-            self.substitute(target_dir, self.info_file, aux)
+            replacement_dict = {'changeme': aux}
+            self.substitute(target_dir, self.info_file, replacement_dict)
 
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)
             aux += 'local ai_id = {};\n'.format(ai_id)
-            self.substitute(target_dir, self.main_file, aux)
+            replacement_dict = {'changeme': aux}
+            self.substitute(target_dir, self.main_file, replacement_dict)
             return ai_name
         
-    def substitute(self, target_dir, target_file, content):
+    def substitute(self, target_dir, target_file, replacement_dict):
         base_path = self.base_dir + '/' + target_file
         target_path = target_dir+ '/' + target_file
         base_file = open(base_path, 'r')
@@ -55,13 +58,13 @@ class AIBuilder:
         line = base_file.readline()
         #print target_path
         while line != '':
-#           # print line
             #TODO: arranjar uma string menos idiota
-            if line.find("changeme") != -1 :
-            #    print line
-            #    print content
-                target_file.write(content + '\n')
-            else:
+            found = False
+            for k in replacement_dict.keys():
+                if k in line :
+                    target_file.write(replacement_dict[k] + '\n')
+                    found = True
+            if not found:
                 target_file.write(line)
             line = base_file.readline()
 #        print ': )'
