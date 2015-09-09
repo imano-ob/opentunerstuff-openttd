@@ -25,7 +25,9 @@ enum SignalMode {
 	NONE, FORWARD, BACKWARD
 }
 
-class ChooChoo extends AIController {
+
+tune-mainclassname
+//class ChooChoo extends AIController {
 	
 	function Start() {
 

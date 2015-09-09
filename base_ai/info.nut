@@ -1,4 +1,5 @@
-class ChooChoo extends AIInfo {
+tune-classname
+//class ChooChoo extends AIInfo {
 	function GetAuthor()      { return "Michiel Konstapel"; }
     changeme
     function GetDescription() { return "Muck about with trains"; }
@@ -16,5 +17,5 @@ class ChooChoo extends AIInfo {
 	    AddLabels("PathfinderMultiplier", {_1 = "Slow", _2 = "Medium", _3 = "Fast", _4 = "Very fast"});
 	}
 }
-
-RegisterAI(ChooChoo());
+tune-registerai
+//RegisterAI(ChooChoo());

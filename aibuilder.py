@@ -41,12 +41,18 @@ class AIBuilder:
             
             aux = '	function GetName() {return "%s";}\n' % (ai_name)
             aux +=' function CreateInstance() {return "%s";} \n' % (ai_name)
-            replacement_dict = {'changeme': aux}
+            class_name = 'class %s extends AIInfo {' % (ai_name)
+            register_line = 'RegisterAI(%s());' % (ai_name)
+            replacement_dict = {'changeme': aux,
+                                'tune-classname':class_name,
+                                'tune-registerai':register_line}
             self.substitute(target_dir, self.info_file, replacement_dict)
 
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)
             aux += 'local ai_id = {};\n'.format(ai_id)
-            replacement_dict = {'changeme': aux}
+            class_declaration = 'class %s extends AIController{' % (ai_name)
+            replacement_dict = {'changeme': aux,
+                                'tune-mainclassname':class_declaration}
             self.substitute(target_dir, self.main_file, replacement_dict)
             return ai_name
         
