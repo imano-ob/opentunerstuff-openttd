@@ -47,6 +47,7 @@ class TTDHandler():
     def start_ai(self, ai, ai_id):
 
         #management stuff
+        print "starting AI"
         self.add_ai_lock.acquire()
         self.handler_lock.acquire()
         self.started_ais += 1
@@ -54,9 +55,12 @@ class TTDHandler():
         self.handler_lock.release()
         if self.started_ais < self.ais_per_round:
             self.add_ai_lock.release()
-            
-#        self.result_locks[ai_id] = threading.Lock()
-#        self.result_locks[ai_id].acquire()
+
+        print "start and get result lock {}".format(ai_id)
+        self.result_locks[ai_id] = threading.Lock()
+        self.result_locks[ai_id].acquire()
+        print "self result locks -> ",self.result_locks
+        print "self result lock[id]-> ",self.result_locks[ai_id]
         
         #server communication
         cmd = "rescan_ai"
@@ -66,17 +70,22 @@ class TTDHandler():
         
     def stop_ai(self, ttd_id, ai_id):
         cmd = "stop_ai {}".format(ttd_id + 1) #reasons
+        print "Gonna stop an AI"
         self.write_to_server(cmd)
         self.active_ais -= 1
         if self.active_ais == 0 and self.started_ais == self.ais_per_round:
+            print "Resettin'"
             self.reset_server()
-#        self.result_locks[ai_id].release()
+        print "Release the lock {}".format(ai_id)
+        print "self result locks -> ",self.result_locks
+        print "self result lock[id]-> ",self.result_locks[ai_id]
+        self.result_locks[ai_id].release()
 
         
     def read_output(self):
         while True:
             last_line = self.server.stdout.readline()
-            print last_line
+#            print last_line
             if last_line == '':
                 return
             if last_line.find('starting game') != -1:
@@ -84,8 +93,9 @@ class TTDHandler():
             ai_id, ttd_id, content = self.parse(last_line)
             if ai_id == None:
                 continue
+            print "I got something"
             self.bufs[ai_id] = content
-            self.stop_ai(ttd_id, ai_id)
+            self.stop_ai(ttd_id, int(ai_id))
 
     def parse(self, line):
         #AIs: começam com [script]
@@ -112,11 +122,13 @@ class TTDHandler():
             
     def result(self, ai_id):
         #TODO: cleanup de coisas relacionadas à ai que vai morrer
-
+        print "waiting for result"
         self.result_locks[ai_id].acquire()
-        res = int(self.bufs[ai_id])        
+        res = int(self.bufs[ai_id])
+        print "result get"
         self.result_locks[ai_id].release()
 
+        print "Getting rid of locks yo"
         self.bufs[ai_id] = None
         self.result_locks[ai_id] = None
 
