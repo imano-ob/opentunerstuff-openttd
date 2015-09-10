@@ -22,6 +22,9 @@ class TTDHandler():
         self.result_locks = {}
         self.running = False
         self.wait_lock = threading.Lock()
+
+        self.start_time = time.time()
+        self.logfile = open("logfile.log", "w")
         
     def start(self, args = ["openttd",
                             "-D",
@@ -115,6 +118,9 @@ class TTDHandler():
 
         self.bufs[ai_id] = None
         self.result_locks[ai_id] = None
+
+        timediff = time.time() - self.start_time
+        self.logfile.write("time: {}, res: {}\n".format(timediff, res))
 
         return res
         
