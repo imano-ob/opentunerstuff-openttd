@@ -55,8 +55,8 @@ class TTDHandler():
         if self.started_ais < self.ais_per_round:
             self.add_ai_lock.release()
             
-        self.result_locks[ai_id] = threading.Lock()
-        self.result_locks[ai_id].acquire()
+#        self.result_locks[ai_id] = threading.Lock()
+#        self.result_locks[ai_id].acquire()
         
         #server communication
         cmd = "rescan_ai"
@@ -64,13 +64,13 @@ class TTDHandler():
         cmd = "start_ai {}".format(ai)
         self.write_to_server(cmd)
         
-    def stop_ai(self, ttd_id):
+    def stop_ai(self, ttd_id, ai_id):
         cmd = "stop_ai {}".format(ttd_id + 1) #reasons
         self.write_to_server(cmd)
         self.active_ais -= 1
         if self.active_ais == 0 and self.started_ais == self.ais_per_round:
             self.reset_server()
-        self.result_locks[ai_id].release()
+#        self.result_locks[ai_id].release()
 
         
     def read_output(self):
@@ -85,26 +85,27 @@ class TTDHandler():
             if ai_id == None:
                 continue
             self.bufs[ai_id] = content
-            self.stop_ai(ttd_id)
+            self.stop_ai(ttd_id, ai_id)
 
     def parse(self, line):
         #AIs: começam com [script]
         #São da forma [script][<ID>][<Error/Warning/Info>] <Texto>
-        #AIs devem ter output da froma [<Tuner ID>][<Resultado>] for
+        #AIs devem ter output da forma [tuner][<Tuner ID>][<Resultado>] for
         #simplicity's sake
-        tmp = line.split(']')
-        for field in tmp:
-            field.strip('[')
-        if len(tmp) < 6 or tmp[1] != 'script' or tmp[3] != 'tuner':
+        if not "tuner" in line:
             return None, None, None
+        tmp = line.split(']')
         #Campos restantes são irrelevantes para nossos propósitos
         #TODO: Possivelmente certificar que vai continuar funcionando
         #no futuro
         for i in tmp:
-            print str(i) + ' -> ' + tmp[i]
-        ai_id = tmp[4]
-        ttd_id = tmp[2]
-        content = tmp[5]
+            print i
+        ai_id = tmp[4].replace('[', '')#.strip('[')
+        print "ai id -> ", ai_id
+        ttd_id = int(tmp[1].replace('[',''))
+        print "ttd id -> ", ttd_id
+        content = tmp[5].replace('[','')
+        print "content -> ", content
         print "handler leu -> {} {} {}".format(ai_id, ttd_id, content)
 
         return ai_id, ttd_id, content
@@ -113,7 +114,7 @@ class TTDHandler():
         #TODO: cleanup de coisas relacionadas à ai que vai morrer
 
         self.result_locks[ai_id].acquire()
-        res = self.bufs[ai_id]        
+        res = int(self.bufs[ai_id])        
         self.result_locks[ai_id].release()
 
         self.bufs[ai_id] = None
