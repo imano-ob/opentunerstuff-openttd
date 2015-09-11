@@ -12,17 +12,24 @@ class TTDHandler():
                  ais_per_round = 8):
 
         self.ais_per_round = ais_per_round
-        self.handler_lock = threading.Lock()
         self.started_ais = 0
         self.active_ais = 0
-        self.add_ai_lock = threading.Lock()
-                
-        self.server_in_lock = threading.Lock()
-        self.bufs = {}
-        self.result_locks = {}
         self.running = False
+        
+        self.bufs = {}
+                
+        #Mutex de variaveis internas do handler
+        self.handler_lock = threading.Lock()
+        #Lock para não ter mais IAs do que o permitido rodando
+        self.add_ai_lock = threading.Lock()
+        #Mutex de escrita no servidor
+        self.server_in_lock = threading.Lock()
+        #Locks de espera de resultados
+        self.result_locks = {}
+        #Lock para esperar servidor estar rodando
         self.wait_lock = threading.Lock()
 
+        #Log de resultados
         self.start_time = time.time()
         self.logfile = open("logfile.log", "w")
         
@@ -85,10 +92,9 @@ class TTDHandler():
     def read_output(self):
         while True:
             last_line = self.server.stdout.readline()
-#            print last_line
             if last_line == '':
                 return
-            if last_line.find('starting game') != -1:
+            if 'starting game' in last_line:
                 self.wait_lock.release()
             ai_id, ttd_id, content = self.parse(last_line)
             if ai_id == None:
@@ -141,6 +147,7 @@ class TTDHandler():
         #TODO: cleanup
         self.write_to_server("quit")
         self.running = False
+        self.logfile.close()
 
     def reset_server(self):
         self.wait_lock.acquire()
