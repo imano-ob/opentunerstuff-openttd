@@ -135,8 +135,8 @@ class TTDHandler():
         self.result_locks[ai_id].release()
 
         print "Getting rid of locks yo"
-        self.bufs[ai_id] = None
-        self.result_locks[ai_id] = None
+        del self.bufs[ai_id]
+        del self.result_locks[ai_id]
 
         timediff = time.time() - self.start_time
         self.logfile.write("time: {}, res: {}\n".format(timediff, res))
