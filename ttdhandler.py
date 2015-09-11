@@ -5,6 +5,7 @@ import subprocess
 import threading
 import sys
 import time
+import os
 
 class TTDHandler():
     def __init__(self,
@@ -31,7 +32,12 @@ class TTDHandler():
 
         #Log de resultados
         self.start_time = time.time()
-        self.logfile = open("logfile.log", "w")
+        i = 0
+        logname = "logfile{}.log".format(i) 
+        while os.path.exists(logname):
+            i += 1
+            logname = "logfile{}.log".format(i) 
+        self.logfile = open(logname, "w")
         
     def start(self, args = ["openttd",
                             "-D",
@@ -140,6 +146,8 @@ class TTDHandler():
 
         timediff = time.time() - self.start_time
         self.logfile.write("time: {}, res: {}\n".format(timediff, res))
+        self.logfile.flush()
+        os.fsync(self.logfile.fileno())
 
         return res
         
