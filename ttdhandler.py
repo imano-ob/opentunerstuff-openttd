@@ -95,7 +95,7 @@ class TTDHandler():
                 continue
             print "I got something"
             self.bufs[ai_id] = content
-            self.stop_ai(ttd_id, int(ai_id))
+            self.stop_ai(ttd_id, ai_id)
 
     def parse(self, line):
         #AIs: começam com [script]
@@ -110,11 +110,11 @@ class TTDHandler():
         #no futuro
         for i in tmp:
             print i
-        ai_id = tmp[4].replace('[', '')#.strip('[')
+        ai_id = int(tmp[4].replace('[', ''))
         print "ai id -> ", ai_id
         ttd_id = int(tmp[1].replace('[',''))
         print "ttd id -> ", ttd_id
-        content = tmp[5].replace('[','')
+        content = int(tmp[5].replace('[',''))
         print "content -> ", content
         print "handler leu -> {} {} {}".format(ai_id, ttd_id, content)
 
