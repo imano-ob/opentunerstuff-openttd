@@ -3,3 +3,4 @@
 
 base_dir = '/home/joao/pizza'
 target_dir = 'c:/pizza'
+ttd_command = 'openttd'

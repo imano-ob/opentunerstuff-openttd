@@ -6,6 +6,7 @@ import threading
 import sys
 import time
 import os
+import config
 
 class TTDHandler():
     def __init__(self,
@@ -29,7 +30,7 @@ class TTDHandler():
         self.result_locks = {}
         #Lock para esperar servidor estar rodando
         self.wait_lock = threading.Lock()
-        #Lock de escrita de log
+        #Mutex de escrita de log
         self.log_lock = threading.Lock()
         
         #Log de resultados
@@ -40,8 +41,10 @@ class TTDHandler():
             i += 1
             logname = "logfile{}.log".format(i) 
         self.logfile = open(logname, "w")
+
+        self.ttd_command = config.ttd_command
         
-    def start(self, args = ["openttd",
+    def start(self, args = [self.ttd_command,
                             "-D",
                             "-d script 5"]):
         if self.running:
