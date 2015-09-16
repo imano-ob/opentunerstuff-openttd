@@ -3,5 +3,6 @@ opentuner.log
 adddeps.py
 *.pyc
 *~
+logfile*.log
 config.py
 \#*\#
