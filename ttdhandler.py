@@ -112,8 +112,8 @@ class TTDHandler():
             self.stop_ai(ttd_id, ai_id)
 
     def parse(self, line):
-        #AIs: começam com [script]
-        #São da forma [script][<ID>][<Error/Warning/Info>] <Texto>
+        #AIs: output começa com <alguma coisa>[script] <-- Eu acho que o alguma coisa é dbg:
+        #São da forma <alguma coisa>[script][<ID>][<Error/Warning/Info>] <Texto>
         #AIs devem ter output da forma [tuner][<Tuner ID>][<Resultado>] for
         #simplicity's sake
         if not "tuner" in line:
@@ -135,7 +135,6 @@ class TTDHandler():
         return ai_id, ttd_id, content
             
     def result(self, ai_id):
-        #TODO: cleanup de coisas relacionadas à ai que vai morrer
         print "waiting for result"
         self.result_locks[ai_id].acquire()
         res = int(self.bufs[ai_id])
@@ -165,11 +164,14 @@ class TTDHandler():
         self.write_to_server("restart")
         self.wait_lock.acquire()
         self.wait_lock.release()
+        self.handler_lock.acquire()
         self.started_ais = 0
         self.active_ais = 0
+        self.handler_lock.release()
         self.add_ai_lock.release()
         
     def write_to_server(self, msg):
+        #Tempo para garantir que o server leu e entendeu a mensagem
         sleep_time = 0.5
         #Coderproofing
         msg += '\n'
