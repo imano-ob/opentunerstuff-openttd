@@ -52,6 +52,11 @@ class AIBuilder:
                                 'tune-mainclassname':class_declaration}
             self.substitute(target_dir, self.main_file, replacement_dict)
             return ai_name
+
+    def destroy(self, ai_id):
+        ai_name = self.base_name + str(ai_id)
+        target_dir = os.path.join(self.target_dir,ai_name)
+        shutil.rmtree(target_dir)
         
     def substitute(self, target_dir, target_file, replacement_dict):
         base_path = os.path.join(self.base_dir, target_file)

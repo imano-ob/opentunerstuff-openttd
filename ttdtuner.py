@@ -104,6 +104,7 @@ class TTDTuner(MeasurementInterface):
         print('ai name ->' + ai_name)
         self.handler.start_ai(ai_name, result_id)
         res = self.handler.result(result_id)
+        self.builder.destroy(result_id)
         return Result(time = -res)
     
     def save_final_config(self, configuration):
