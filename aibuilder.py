@@ -3,6 +3,7 @@
 
 import shutil
 import config
+import os
 
 class AIBuilder:
     def __init__(self):
@@ -18,7 +19,7 @@ class AIBuilder:
         #Isso vai copiar inclusive coisas a serem reescritas depois
         #TODO: tratar erros
         ai_name = self.base_name + str(ai_id)
-        target_dir = self.target_dir + "/" + ai_name + "/"
+        target_dir = os.path.join(self.target_dir,ai_name)
         try:
             shutil.copytree(self.base_dir, target_dir)
         except OSError as e:
@@ -53,8 +54,8 @@ class AIBuilder:
             return ai_name
         
     def substitute(self, target_dir, target_file, replacement_dict):
-        base_path = self.base_dir + '/' + target_file
-        target_path = target_dir+ '/' + target_file
+        base_path = os.path.join(self.base_dir, target_file)
+        target_path = os.path.join(target_dir, target_file)
         base_file = open(base_path, 'r')
         target_file = open(target_path, 'w')
         line = base_file.readline()
