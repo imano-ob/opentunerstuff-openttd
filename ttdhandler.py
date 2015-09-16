@@ -29,7 +29,9 @@ class TTDHandler():
         self.result_locks = {}
         #Lock para esperar servidor estar rodando
         self.wait_lock = threading.Lock()
-
+        #Lock de escrita de log
+        self.log_lock = threading.Lock()
+        
         #Log de resultados
         self.start_time = time.time()
         i = 0
@@ -145,10 +147,11 @@ class TTDHandler():
         del self.result_locks[ai_id]
 
         timediff = time.time() - self.start_time
+        self.log_lock.acquire()
         self.logfile.write("time: {}, res: {}\n".format(timediff, res))
         self.logfile.flush()
         os.fsync(self.logfile.fileno())
-
+        self.log_lock.release()
         return res
         
     def shutdown(self):
