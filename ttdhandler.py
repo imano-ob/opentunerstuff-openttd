@@ -43,14 +43,16 @@ class TTDHandler():
         self.logfile = open(logname, "w")
 
         self.ttd_command = config.ttd_command
-        
-    def start(self, args = [self.ttd_command,
-                            "-D",
-                            "-d script 5"]):
+
+    def start(self, args = None):
         if self.running:
             #OhNoes!
             #construir exceção/retornar algo?
             raise
+        if args == None:
+            args = [self.ttd_command,
+                    "-D",
+                    "-d script 5"]
         self.server = subprocess.Popen(args,
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
