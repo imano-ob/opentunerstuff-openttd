@@ -26,10 +26,10 @@ class TTDTuner(MeasurementInterface):
     def __init__(self, *pargs, **kwargs):
         super(TTDTuner, self).__init__(*pargs, **kwargs)
         self.parallel_compile = True
-        self.handler = ttdhandler.TTDHandler()
-        self.handler.start()
+#        self.handler = ttdhandler.TTDHandler()
+#        self.handler.start()
 
-        self.builder = aibuilder.AIBuilder()
+#        self.builder = aibuilder.AIBuilder()
         
         #Might be useful in the future, who knows
         #It already has been
@@ -85,32 +85,32 @@ class TTDTuner(MeasurementInterface):
 #TODO: gerar nome de AI para ser unico de acordo com cfg e usar compile?
 #ou não vale o esforço?
     
-#    def compile(self, cfg, result_id):
-#        self.handler.start_ai(self.ais[cfg['AI']], result_id)
-#        return 0
+    def compile(self, cfg, result_id):
+#        cfg = desired_result.configuration.data
+        print "before -> ", threading.active_count()
+        self.build_args_file(cfg, result_id)
+        return 0
     
-#    def run_precompiled(self, desired_result, input, limit, compile_result,
-#                        result_id):
-#        res = self.handler.result(result_id)
-#        return Result(time = -res)
-        
-    def run(self, desired_result, input, limit):
+    def run_precompiled(self, desired_result, input, limit, compile_result,
+                        result_id):
         self.idlock.acquire()
-        result_id = self.cur_id
+        cur_id = self.cur_id
         self.cur_id += 1
         self.idlock.release()
-        cfg = desired_result.configuration.data
-
-        arg_file_name = self.build_args_file(cfg, result_id)
-        print "before -> ", threading.active_count()
+        print "after -> ", threading.active_count()
+        arg_file_name = "args{}.py".format(result_id)
         results = self.call_program(["python2",
                                      "ttd_conn.py",
-                                      arg_file_name])
-        
-        print "after -> ", threading.active_count()
+                                     arg_file_name,
+                                     str(cur_id)])
         final_res = int(results['stdout'])
-        os.remove(arg_file_name)
         return Result(time = -final_res)
+
+    def run(self, desired_result, input, limit):
+        pass
+#        print "before -> ", threading.active_count()
+#        
+#        print "after -> ", threading.active_count()
         
         #ai_name = self.builder.build(cfg, result_id)
         #print('ai name ->' + ai_name)
@@ -132,7 +132,6 @@ class TTDTuner(MeasurementInterface):
             arg_file.write("    {}:{}\n".format(k, args[k]))
         arg_file.write("}\n")
         arg_file.close()
-        return arg_file_name
         
 if __name__ == '__main__':
   argparser = opentuner.default_argparser()
