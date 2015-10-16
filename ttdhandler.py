@@ -60,6 +60,10 @@ class TTDHandler():
 
         self.ttd_command = config.ttd_command
 
+################################################
+# start
+################################################
+        
     def start(self, args = None):
         if self.running:
             #OhNoes!
@@ -87,7 +91,11 @@ class TTDHandler():
         self.read_thread.start()
         self.server_started.wait(10)
         self.running = True
-                
+
+################################################
+# start_ai
+################################################
+        
     def start_ai(self, ai, ai_id):
 
         #management stuff
@@ -113,6 +121,10 @@ class TTDHandler():
         self.write_to_server(cmd)
         cmd = "start_ai {}".format(ai)
         self.write_to_server(cmd)
+
+################################################
+# stop_ai
+################################################
         
     def stop_ai(self, ttd_id, ai_id):
         cmd = "stop_ai {}".format(ttd_id + 1) #reasons
@@ -127,7 +139,10 @@ class TTDHandler():
         print "self result lock[id]-> ",self.result_locks[ai_id]
         self.result_locks[ai_id].release()
 
-        
+################################################
+# read_output
+################################################
+
     def read_output(self):
         while True:
             self.res_lock.acquire()
@@ -153,6 +168,10 @@ class TTDHandler():
             self.bufs[ai_id].append(content)
             self.stop_ai(ttd_id, ai_id)
 
+################################################
+# parse
+################################################
+
     def parse(self, line):
         #AIs: output começa com <alguma coisa>[script] <-- Eu acho que o alguma coisa é dbg:
         #São da forma <alguma coisa>[script][<ID>][<Error/Warning/Info>] <Texto>
@@ -177,7 +196,11 @@ class TTDHandler():
         print "handler leu -> {} {} {}".format(ai_id, ttd_id, content)
 
         return ai_id, ttd_id, content
-            
+
+################################################
+# result
+################################################
+
     def result(self, ai_id):
         print "waiting for result"
         self.result_locks[ai_id].acquire()
@@ -196,12 +219,20 @@ class TTDHandler():
         os.fsync(self.logfile.fileno())
         self.log_lock.release()
         return res
-        
+
+################################################
+# shutdown
+################################################
+    
     def shutdown(self):
         #TODO: cleanup
         self.write_to_server("quit")
         self.running = False
         self.logfile.close()
+
+################################################
+# reset_server
+################################################
 
     def reset_server(self):
         #self.write_to_server("restart")
@@ -211,6 +242,10 @@ class TTDHandler():
         self.active_ais = 0
         self.handler_lock.release()
         self.add_ai_lock.release()
+        
+################################################
+# write_and_wait_response
+################################################
 
     def write_and_wait_response(self, msg, response, condition = None, timeout = 10):
         if not condition:
@@ -222,6 +257,10 @@ class TTDHandler():
         self.write_to_server(msg)
         condition.wait(timeout)
         
+################################################
+# write_to_server
+################################################
+
     def write_to_server(self, msg):
         #Tempo para garantir que o server leu e entendeu a mensagem
         sleep_time = 0.5
