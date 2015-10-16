@@ -22,14 +22,30 @@ class TTDHandler():
                 
         #Mutex de variaveis internas do handler
         self.handler_lock = threading.Lock()
+
         #Lock para não ter mais IAs do que o permitido rodando
         self.add_ai_lock = threading.Lock()
+
         #Mutex de escrita no servidor
         self.server_in_lock = threading.Lock()
+
         #Locks de espera de resultados
         self.result_locks = {}
+
+        #Mutex de coisas que dependem de resposta de servidor
+        self.res_lock = threading.Lock()
+        
         #Lock para esperar servidor estar rodando
         self.wait_lock = threading.Lock()
+        self.server_started = threading.Condition(self.wait_lock)
+
+        #Lock para esperar AI morrer
+        #self.stop_ai_lock = threading.Lock()
+        #self.ai_stopped = threading.Condition(self.stop_ai_lock)
+        
+        #Esperas de resposta de server
+        self.waiting = {}
+        
         #Mutex de escrita de log
         self.log_lock = threading.Lock()
         
@@ -52,16 +68,24 @@ class TTDHandler():
         if args == None:
             args = [self.ttd_command,
                     "-D",
-                    "-d script 5"]
+                    "-d5"]
+            print "heyo"
+            #para caso shell = True
+       #     args = self.ttd_command + " -D -d script=5"
+        else:
+            print "huh"
         self.server = subprocess.Popen(args,
+                                       #Dunno
+                                       # shell = True,
+                                       #Dunno as well
+                                       bufsize = 1,
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
         self.read_thread = threading.Thread(target = self.read_output)
-        self.wait_lock.acquire()
+        self.server_started.acquire()
         self.read_thread.start()
-        self.wait_lock.acquire()
-        self.wait_lock.release()
+        self.server_started.wait(10)
         self.running = True
                 
     def start_ai(self, ai, ai_id):
@@ -93,7 +117,7 @@ class TTDHandler():
     def stop_ai(self, ttd_id, ai_id):
         cmd = "stop_ai {}".format(ttd_id + 1) #reasons
         print "Gonna stop an AI"
-        self.write_to_server(cmd)
+        self.write_and_wait_response(cmd, "AI stopped")
         self.active_ais -= 1
         if self.active_ais == 0 and self.started_ais == self.ais_per_round:
             print "Resettin'"
@@ -106,13 +130,24 @@ class TTDHandler():
         
     def read_output(self):
         while True:
+            self.res_lock.acquire()
             last_line = self.server.stdout.readline()
+            self.res_lock.release()
             if last_line == '':
                 return
-            if 'starting game' in last_line:
-                self.wait_lock.release()
-            ai_id, ttd_id, content = self.parse(last_line)
-            if ai_id == None:
+            #Easier on the eyes on debugs
+            last_line = last_line.replace('\n', '')
+#            print last_line
+            for k in self.waiting.keys():
+                if k in last_line:
+                    #print last_line
+                    self.waiting[k].acquire()
+                    self.waiting[k].notify()
+                    self.waiting[k].release()
+                    del(self.waiting[k])
+            if "[tuner]" in last_line:
+                ai_id, ttd_id, content = self.parse(last_line)
+            else:
                 continue
             print "I got something"
             self.bufs[ai_id].append(content)
@@ -123,7 +158,9 @@ class TTDHandler():
         #São da forma <alguma coisa>[script][<ID>][<Error/Warning/Info>] <Texto>
         #AIs devem ter output da forma [tuner][<Tuner ID>][<Resultado>] for
         #simplicity's sake
-        if not "tuner" in line:
+
+        #Redundancia
+        if not "[tuner]" in line:
             return None, None, None
         tmp = line.split(']')
         #Campos restantes são irrelevantes para nossos propósitos
@@ -167,15 +204,23 @@ class TTDHandler():
         self.logfile.close()
 
     def reset_server(self):
-        self.wait_lock.acquire()
-        self.write_to_server("restart")
-        self.wait_lock.acquire()
-        self.wait_lock.release()
+        #self.write_to_server("restart")
+        self.write_and_wait_response("restart", "game started")
         self.handler_lock.acquire()
         self.started_ais = 0
         self.active_ais = 0
         self.handler_lock.release()
         self.add_ai_lock.release()
+
+    def write_and_wait_response(self, msg, response, condition = None, timeout = 10):
+        if not condition:
+            condition = threading.Condition()
+        self.res_lock.acquire()
+        self.waiting[response] = condition
+        condition.acquire()
+        self.res_lock.release()
+        self.write_to_server(msg)
+        condition.wait(timeout)
         
     def write_to_server(self, msg):
         #Tempo para garantir que o server leu e entendeu a mensagem
