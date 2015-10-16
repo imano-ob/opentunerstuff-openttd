@@ -72,6 +72,8 @@ class TTDHandler():
         self.handler_lock.acquire()
         self.started_ais += 1
         self.active_ais += 1
+        if ai_id not in self.bufs.keys():
+            self.bufs[ai_id] = []
         self.handler_lock.release()
         if self.started_ais < self.ais_per_round:
             self.add_ai_lock.release()
@@ -79,8 +81,8 @@ class TTDHandler():
         print "start and get result lock {}".format(ai_id)
         self.result_locks[ai_id] = threading.Lock()
         self.result_locks[ai_id].acquire()
-        print "self result locks -> ",self.result_locks
-        print "self result lock[id]-> ",self.result_locks[ai_id]
+#        print "self result locks -> ",self.result_locks
+#        print "self result lock[id]-> ",self.result_locks[ai_id]
         
         #server communication
         cmd = "rescan_ai"
@@ -113,7 +115,7 @@ class TTDHandler():
             if ai_id == None:
                 continue
             print "I got something"
-            self.bufs[ai_id] = content
+            self.bufs[ai_id].append(content)
             self.stop_ai(ttd_id, ai_id)
 
     def parse(self, line):
@@ -142,17 +144,17 @@ class TTDHandler():
     def result(self, ai_id):
         print "waiting for result"
         self.result_locks[ai_id].acquire()
-        res = int(self.bufs[ai_id])
+        res = int(self.bufs[ai_id].pop())
         print "result get"
         self.result_locks[ai_id].release()
 
-        print "Getting rid of locks yo"
-        del self.bufs[ai_id]
-        del self.result_locks[ai_id]
+        #print "Getting rid of locks yo"
+        #del self.bufs[ai_id]
+        #del self.result_locks[ai_id]
 
         timediff = time.time() - self.start_time
         self.log_lock.acquire()
-        self.logfile.write("time: {}, res: {}\n".format(timediff, res))
+        self.logfile.write("id: {}, time: {}, res: {}\n".format(ai_id, timediff, res))
         self.logfile.flush()
         os.fsync(self.logfile.fileno())
         self.log_lock.release()
