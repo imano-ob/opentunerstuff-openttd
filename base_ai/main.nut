@@ -101,13 +101,15 @@ tune-mainclassname
 				}
 			}
         local curDate = AIDate.GetCurrentDate();
-        if (curDate - beginDate >= 365){
+tuneryears
+//        if (curDate - beginDate >= 365){
 //               local msg = "[";
 //               msg = msg + ai_id;
 //               msg = msg + "][";
  //              msg = msg + GetBankBalance();
-//               msg = msg + "]";  
-               AILog.Info("[tuner][" + ai_id + "][" + AICompany.GetBankBalance(AICompany.COMPANY_SELF)  + "]");
+//               msg = msg + "]";
+tuneroutput
+//               AILog.Info("[tuner][" + ai_id + "][" + AICompany.GetBankBalance(AICompany.COMPANY_SELF)  + "]");
 //               Debug(msg);
                beginDate = curDate;
            }

@@ -38,9 +38,17 @@ class AIBuilder:
             shutil.copytree(self.base_dir, target_dir)
         finally:
 
+            #
+            #Costs
+            #
+            
             arg_string = self.build_arg_string(args)
             replacement_dict = {'changeme': arg_string}
             self.substitute(target_dir, self.cost_file, replacement_dict)
+
+            #
+            #Info
+            #
             
             aux = '	function GetName() {return "%s";}\n' % (ai_name)
             aux +=' function CreateInstance() {return "%s";} \n' % (ai_name)
@@ -51,11 +59,31 @@ class AIBuilder:
                                 'tune-registerai':register_line}
             self.substitute(target_dir, self.info_file, replacement_dict)
 
+            #
+            #Main
+            #
+
+            if self.restype == 'money':
+                func = 'AICompany.GetBankBalance(AICompany.COMPANY_SELF)'
+
+            if self.restype == 'value':
+                func = 'AICompany.GetQuarterlyCompanyValue(AICompany.COMPANY_SELF, AICompany.CURRENT_QUARTER)'
+
+            if self.restype == 'profit':
+                func = 'AICompany.GetQuarterlyIncome(AICompany.COMPANY_SELF, AICompany.CURRENT_QUARTER) - AICompany.GetQuarterlyExpenses(AICompany.COMPANY_SELF, AICompany.CURRENT_QUARTER)'
+
+
+            out =  'AILog.Info("[tuner][" + ai_id + "][" + {} + "]");'.format(func)
+
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)
             aux += 'local ai_id = {};\n'.format(ai_id)
             class_declaration = 'class %s extends AIController{' % (ai_name)
+            years = "if (curDate - beginDate >= %s){" % (self.years * 365)
+            
             replacement_dict = {'changeme': aux,
-                                'tune-mainclassname':class_declaration}
+                                'tune-mainclassname':class_declaration,
+                                'tuneryears':years,
+                                'tuneroutput':out}
             self.substitute(target_dir, self.main_file, replacement_dict)
             return ai_name
 
