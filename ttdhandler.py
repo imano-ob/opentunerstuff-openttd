@@ -19,6 +19,7 @@ class TTDHandler():
         self.running = False
         
         self.bufs = {}
+        self.ai_instances = {}
                 
         #Mutex de variaveis internas do handler
         self.handler_lock = threading.Lock()
@@ -82,7 +83,7 @@ class TTDHandler():
                                        #Dunno
                                        # shell = True,
                                        #Dunno as well
-                                       bufsize = 1,
+                                       #bufsize = 1,
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
@@ -96,19 +97,9 @@ class TTDHandler():
 # start_ai
 ################################################
         
-    def start_ai(self, ai, ai_id):
+    def start_ai(self, ai, ai_id, n = 1):
 
         #management stuff
-        print "starting AI"
-        self.add_ai_lock.acquire()
-        self.handler_lock.acquire()
-        self.started_ais += 1
-        self.active_ais += 1
-        if ai_id not in self.bufs.keys():
-            self.bufs[ai_id] = []
-        self.handler_lock.release()
-        if self.started_ais < self.ais_per_round:
-            self.add_ai_lock.release()
 
         print "start and get result lock {}".format(ai_id)
         self.result_locks[ai_id] = threading.Lock()
@@ -119,8 +110,22 @@ class TTDHandler():
         #server communication
         cmd = "rescan_ai"
         self.write_to_server(cmd)
-        cmd = "start_ai {}".format(ai)
-        self.write_to_server(cmd)
+        while n > 0:
+            print "starting AI"
+            self.add_ai_lock.acquire()
+            self.handler_lock.acquire()
+            self.started_ais += 1
+            self.active_ais += 1
+            if ai_id not in self.bufs.keys():
+                self.bufs[ai_id] = []
+            if ai_id not in self.ai_instances.keys():
+                self.ai_instances[ai_id] = 0
+            self.ai_instances[ai_id] += 1
+            self.handler_lock.release()
+            if self.started_ais < self.ais_per_round:
+                self.add_ai_lock.release()    
+            cmd = "start_ai {}".format(ai)
+            self.write_to_server(cmd)
 
 ################################################
 # stop_ai
@@ -130,15 +135,19 @@ class TTDHandler():
         cmd = "stop_ai {}".format(ttd_id + 1) #reasons
         print "Gonna stop an AI"
         self.write_and_wait_response(cmd, "AI stopped")
+        self.handler_lock.acquire()
         self.active_ais -= 1
+        self.ai_instances[ai_id] -= 1
         if self.active_ais == 0 and self.started_ais == self.ais_per_round:
             print "Resettin'"
             self.reset_server()
-        print "Release the lock {}".format(ai_id)
-        print "self result locks -> ",self.result_locks
-        print "self result lock[id]-> ",self.result_locks[ai_id]
-        self.result_locks[ai_id].release()
-
+            self.handler_lock.release()
+        if self.ai_instances[ai_id] == 0:
+            print "Release the lock {}".format(ai_id)
+            print "self result locks -> ",self.result_locks
+            print "self result lock[id]-> ",self.result_locks[ai_id]
+            self.result_locks[ai_id].release()
+        
 ################################################
 # read_output
 ################################################
@@ -152,7 +161,7 @@ class TTDHandler():
                 return
             #Easier on the eyes on debugs
             last_line = last_line.replace('\n', '')
-#            print last_line
+            #print last_line
             for k in self.waiting.keys():
                 if k in last_line:
                     #print last_line
@@ -204,17 +213,21 @@ class TTDHandler():
     def result(self, ai_id):
         print "waiting for result"
         self.result_locks[ai_id].acquire()
-        res = int(self.bufs[ai_id].pop())
+        #res = int(self.bufs[ai_id].pop())
+        res = self.bufs[ai_id]
+        for i in res:
+            res[i] = int(res[i])
         print "result get"
         self.result_locks[ai_id].release()
 
-        #print "Getting rid of locks yo"
-        #del self.bufs[ai_id]
-        #del self.result_locks[ai_id]
+        print "Getting rid of locks yo"
+        del self.bufs[ai_id]
+        del self.result_locks[ai_id]
 
         timediff = time.time() - self.start_time
         self.log_lock.acquire()
-        self.logfile.write("id: {}, time: {}, res: {}\n".format(ai_id, timediff, res))
+        for i in res:
+            self.logfile.write("id: {}, time: {}, res: {}\n".format(ai_id, timediff, i))
         self.logfile.flush()
         os.fsync(self.logfile.fileno())
         self.log_lock.release()
