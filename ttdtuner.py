@@ -13,9 +13,8 @@ from opentuner import Result
 
 import time
 import random
-#import subprocess
 import threading
-#import argparser
+#import argparse
 
 import ttdhandler
 import aibuilder
@@ -27,7 +26,6 @@ class TTDTuner(MeasurementInterface):
         self.parallel_compile = True
         self.handler = ttdhandler.TTDHandler()
         self.handler.start()
-#        time.sleep(3)
 
         self.builder = aibuilder.AIBuilder()
         
@@ -36,6 +34,10 @@ class TTDTuner(MeasurementInterface):
         self.dbglock = threading.Lock()
         self.idlock = threading.Lock()
         self.cur_id = 0
+
+##############################################
+# manipulator
+##############################################
         
     def manipulator(self):
         manipulator = ConfigurationManipulator()
@@ -93,7 +95,12 @@ class TTDTuner(MeasurementInterface):
 #                        result_id):
 #        res = self.handler.result(result_id)
 #        return Result(time = -res)
-        
+
+##############################################
+# run
+##############################################
+
+
     def run(self, desired_result, input, limit):
         self.idlock.acquire()
         result_id = self.cur_id
@@ -110,7 +117,11 @@ class TTDTuner(MeasurementInterface):
         mean = float(sum)/len(res)
         self.builder.destroy(result_id)
         return Result(time = -mean)
-    
+
+##############################################
+# save final config
+##############################################
+
     def save_final_config(self, configuration):
         self.handler.shutdown()
         self.manipulator().save_to_file(configuration.data,
