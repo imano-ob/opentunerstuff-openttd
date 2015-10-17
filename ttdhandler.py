@@ -100,7 +100,7 @@ class TTDHandler():
     def start_ai(self, ai, ai_id, n = 1):
 
         #management stuff
-
+        
         print "start and get result lock {}".format(ai_id)
         self.result_locks[ai_id] = threading.Lock()
         self.result_locks[ai_id].acquire()
@@ -113,7 +113,9 @@ class TTDHandler():
         while n > 0:
             print "starting AI"
             self.add_ai_lock.acquire()
+            print "got add ai lock"
             self.handler_lock.acquire()
+            print "got handler lock"
             self.started_ais += 1
             self.active_ais += 1
             if ai_id not in self.bufs.keys():
@@ -122,10 +124,11 @@ class TTDHandler():
                 self.ai_instances[ai_id] = 0
             self.ai_instances[ai_id] += 1
             self.handler_lock.release()
-            if self.started_ais < self.ais_per_round:
-                self.add_ai_lock.release()    
             cmd = "start_ai {}".format(ai)
             self.write_to_server(cmd)
+            n -= 1
+        if self.started_ais < self.ais_per_round:
+            self.add_ai_lock.release()    
 
 ################################################
 # stop_ai
@@ -138,10 +141,10 @@ class TTDHandler():
         self.handler_lock.acquire()
         self.active_ais -= 1
         self.ai_instances[ai_id] -= 1
+        self.handler_lock.release()
         if self.active_ais == 0 and self.started_ais == self.ais_per_round:
             print "Resettin'"
             self.reset_server()
-            self.handler_lock.release()
         if self.ai_instances[ai_id] == 0:
             print "Release the lock {}".format(ai_id)
             print "self result locks -> ",self.result_locks
@@ -215,7 +218,7 @@ class TTDHandler():
         self.result_locks[ai_id].acquire()
         #res = int(self.bufs[ai_id].pop())
         res = self.bufs[ai_id]
-        for i in res:
+        for i in xrange(len(res)):
             res[i] = int(res[i])
         print "result get"
         self.result_locks[ai_id].release()

@@ -104,8 +104,12 @@ class TTDTuner(MeasurementInterface):
         print('ai name ->' + ai_name)
         self.handler.start_ai(ai_name, result_id)
         res = self.handler.result(result_id)
+        sum = 0
+        for i in res:
+            sum += i
+        mean = float(sum)/len(res)
         self.builder.destroy(result_id)
-        return Result(time = -res)
+        return Result(time = -mean)
     
     def save_final_config(self, configuration):
         self.handler.shutdown()
