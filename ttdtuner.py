@@ -23,12 +23,15 @@ class TTDTuner(MeasurementInterface):
 
     def __init__(self, *pargs, **kwargs):
         super(TTDTuner, self).__init__(*pargs, **kwargs)
-        self.parallel_compile = True
-        self.handler = ttdhandler.TTDHandler()
-        self.handler.start()
 
         restype = args.restype
         years = args.years
+        self.number_ais = args.numberais
+        
+        self.parallel_compile = True
+        self.handler = ttdhandler.TTDHandler(self.number_ais)
+        self.handler.start()
+
         
         self.builder = aibuilder.AIBuilder(restype, years)
         
@@ -112,7 +115,7 @@ class TTDTuner(MeasurementInterface):
         cfg = desired_result.configuration.data
         ai_name = self.builder.build(cfg, result_id)
         print('ai name ->' + ai_name)
-        self.handler.start_ai(ai_name, result_id)
+        self.handler.start_ai(ai_name, result_id, self.number_ais)
         res = self.handler.result(result_id)
         sum = 0
         for i in res:
@@ -140,5 +143,10 @@ if __name__ == '__main__':
   argparser.add_argument("--years",
                          type = int,
                          default = 10)
+  argparser.add_argument("--number-ais",
+                         dest='numberais',
+                         default = 1,
+                         type = int,
+                         choices = range(1, 14))
   args = argparser.parse_args()
   TTDTuner.main(args)

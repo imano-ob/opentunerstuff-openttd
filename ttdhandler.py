@@ -110,10 +110,10 @@ class TTDHandler():
         #server communication
         cmd = "rescan_ai"
         self.write_to_server(cmd)
+        self.add_ai_lock.acquire()
+        print "got add ai lock"
         while n > 0:
             print "starting AI"
-            self.add_ai_lock.acquire()
-            print "got add ai lock"
             self.handler_lock.acquire()
             print "got handler lock"
             self.started_ais += 1
