@@ -6,7 +6,7 @@ import config
 import os
 
 class AIBuilder:
-    def __init__(self):
+    def __init__(self, restype, years):
         self.base_dir = config.base_dir #./base_ai
         self.target_dir = config.target_dir #~/.openttd/ai
         #TODO: definir e/ou verificar coisas abaixo
@@ -14,7 +14,13 @@ class AIBuilder:
         self.info_file = 'info.nut' #base_directory/info.nut
         self.main_file = 'main.nut' #base_directory/main.nut
         self.base_name = 'test_ai'
-        
+        self.restype = restype
+        self.years = years
+
+###########################################
+# build
+###########################################
+
     def build(self, args, ai_id):
         #Isso vai copiar inclusive coisas a serem reescritas depois
         #TODO: tratar erros
@@ -53,10 +59,18 @@ class AIBuilder:
             self.substitute(target_dir, self.main_file, replacement_dict)
             return ai_name
 
+###########################################
+# destroy
+###########################################        
+        
     def destroy(self, ai_id):
         ai_name = self.base_name + str(ai_id)
         target_dir = os.path.join(self.target_dir,ai_name)
         shutil.rmtree(target_dir)
+
+###########################################
+# substitute
+###########################################
         
     def substitute(self, target_dir, target_file, replacement_dict):
         base_path = os.path.join(self.base_dir, target_file)
@@ -76,6 +90,10 @@ class AIBuilder:
             line = base_file.readline()
         base_file.close()
         target_file.close()
+
+###########################################
+# build arg string
+###########################################
         
     def build_arg_string(self, args):
         str = ""

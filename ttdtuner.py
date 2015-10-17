@@ -27,7 +27,10 @@ class TTDTuner(MeasurementInterface):
         self.handler = ttdhandler.TTDHandler()
         self.handler.start()
 
-        self.builder = aibuilder.AIBuilder()
+        restype = args.restype
+        years = args.years
+        
+        self.builder = aibuilder.AIBuilder(restype, years)
         
         #Might be useful in the future, who knows
         #It already has been
@@ -130,5 +133,12 @@ class TTDTuner(MeasurementInterface):
     
 if __name__ == '__main__':
   argparser = opentuner.default_argparser()
+  argparser.add_argument("--res-type",
+                         dest = 'restype',
+                         choices = ['money', 'value', 'profit'],
+                         default = 'value')
+  argparser.add_argument("--years",
+                         type = int,
+                         default = 10)
   args = argparser.parse_args()
   TTDTuner.main(args)
