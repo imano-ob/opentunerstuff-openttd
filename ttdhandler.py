@@ -8,6 +8,8 @@ import time
 import os
 import config
 
+import datetime
+
 class TTDHandler():
     def __init__(self,
                  #Maximo 15
@@ -59,6 +61,9 @@ class TTDHandler():
             logname = "logfile{}.log".format(i) 
         self.logfile = open(logname, "w")
 
+        #Debug e controle do que está acontecendo
+        #self.ttdlog = open("/tmp/ttdlog", "w")
+
         self.ttd_command = config.ttd_command
 
 ################################################
@@ -73,7 +78,7 @@ class TTDHandler():
         if args == None:
             args = [self.ttd_command,
                     "-D",
-                    "-d5"]
+                    "-d script 5"]
             print "heyo"
             #para caso shell = True
        #     args = self.ttd_command + " -D -d script=5"
@@ -164,6 +169,12 @@ class TTDHandler():
                 return
             #Easier on the eyes on debugs
             last_line = last_line.replace('\n', '')
+            now = datetime.datetime.now()
+            logmsg = "{}:{}: {}\n".format(now.hour, now.minute, last_line)
+            #self.ttdlog.write(logmsg)
+            #self.ttdlog.flush()
+            #os.fsync(self.ttdlog.fileno())
+            sys.stderr.write(logmsg)
             #print last_line
             for k in self.waiting.keys():
                 if k in last_line:
