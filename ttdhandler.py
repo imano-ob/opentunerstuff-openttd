@@ -92,8 +92,8 @@ class TTDHandler():
                                        stdin  = subprocess.PIPE,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.STDOUT)
-        self.read_thread = threading.Thread(target = self.read_output)
         self.server_started.acquire()
+        self.read_thread = threading.Thread(target = self.read_output)
         self.read_thread.start()
         self.server_started.wait(10)
         self.running = True
@@ -163,8 +163,8 @@ class TTDHandler():
     def read_output(self):
         while True:
             self.res_lock.acquire()
-            last_line = self.server.stdout.readline()
             self.res_lock.release()
+            last_line = self.server.stdout.readline()
             if last_line == '':
                 return
             #Easier on the eyes on debugs
@@ -189,7 +189,7 @@ class TTDHandler():
                 continue
             print "I got something"
             self.bufs[ai_id].append(content)
-            self.stop_ai(ttd_id, ai_id)
+            threading.Thread(target = self.stop_ai, args=(ttd_id, ai_id)).start()
 
 ################################################
 # parse
@@ -277,10 +277,13 @@ class TTDHandler():
     def write_and_wait_response(self, msg, response, condition = None, timeout = 10):
         if not condition:
             condition = threading.Condition()
+        print("trying to get res lock")
         self.res_lock.acquire()
+        print("got res lock")
         self.waiting[response] = condition
         condition.acquire()
         self.res_lock.release()
+        print("release res lock")
         self.write_to_server(msg)
         condition.wait(timeout)
         
@@ -293,8 +296,10 @@ class TTDHandler():
         sleep_time = 0.5
         #Coderproofing
         msg += '\n'
+        print("trying to get server lock")
         self.server_in_lock.acquire()
         print('to server ->' + msg)
         self.server.stdin.write(msg)
         time.sleep(sleep_time)
         self.server_in_lock.release()
+        print("released server lock")
