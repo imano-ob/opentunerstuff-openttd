@@ -146,6 +146,7 @@ class TTDHandler():
         self.handler_lock.acquire()
         self.active_ais -= 1
         self.ai_instances[ai_id] -= 1
+        print "active ais: ", self.active_ais
         self.handler_lock.release()
         if self.active_ais == 0 and self.started_ais == self.ais_per_round:
             print "Resettin'"
