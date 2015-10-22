@@ -107,7 +107,7 @@ class TTDTuner(MeasurementInterface):
 ##############################################
 
 
-    def run(self, desired_result, input, limit):
+    def run(self, desired_result, input, limit = 10800):
         self.idlock.acquire()
         result_id = self.cur_id
         self.cur_id += 1
