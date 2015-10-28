@@ -112,6 +112,8 @@ class TTDTuner(MeasurementInterface):
         result_id = self.cur_id
         self.cur_id += 1
         self.idlock.release()
+        print('run: resetting server')
+        self.handler.reset_server()
         cfg = desired_result.configuration.data
         ai_name = self.builder.build(cfg, result_id)
         print('ai name ->' + ai_name)
