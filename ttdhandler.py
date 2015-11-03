@@ -27,7 +27,7 @@ class TTDHandler():
         self.handler_lock = threading.Lock()
 
         #Lock para não ter mais IAs do que o permitido rodando
-        self.add_ai_lock = threading.Lock()
+#        self.add_ai_lock = threading.Lock()
 
         #Mutex de escrita no servidor
         self.server_in_lock = threading.Lock()
@@ -70,14 +70,17 @@ class TTDHandler():
 # start
 ################################################
         
-    def start(self, args = None):
+    def start(self, args = None, port = 5432):
         if self.running:
             #OhNoes!
             #construir exceção/retornar algo?
             raise
         if args == None:
+            dedicated_string = "-D :{}".format(port)
             args = [self.ttd_command,
-                    "-D",
+                    dedicated_string,
+                    "-G 1337",
+                    "-x"
                     "-d script 5"]
             print "heyo"
             #para caso shell = True
@@ -115,7 +118,7 @@ class TTDHandler():
         #server communication
         cmd = "rescan_ai"
         self.write_to_server(cmd)
-        self.add_ai_lock.acquire()
+#        self.add_ai_lock.acquire()
         print "got add ai lock"
         while n > 0:
             print "starting AI"
@@ -133,7 +136,7 @@ class TTDHandler():
             self.write_to_server(cmd)
             n -= 1
         if self.started_ais < self.ais_per_round:
-            self.add_ai_lock.release()    
+ #           self.add_ai_lock.release()    
 
 ################################################
 # stop_ai
@@ -269,7 +272,7 @@ class TTDHandler():
         self.started_ais = 0
         self.active_ais = 0
         self.handler_lock.release()
-        self.add_ai_lock.release()
+#        self.add_ai_lock.release()
         
 ################################################
 # write_and_wait_response
