@@ -15,6 +15,7 @@ import time
 import random
 import threading
 #import argparse
+import os
 
 import ttdhandler
 import aibuilder
@@ -40,6 +41,14 @@ class TTDTuner(MeasurementInterface):
         self.dbglock = threading.Lock()
         self.idlock = threading.Lock()
         self.cur_id = 0
+
+        i = 0
+        logname = "logtuner{}.log".format(i) 
+        while os.path.exists(logname):
+            i += 1
+            logname = "logtuner{}.log".format(i) 
+        self.logfile = open(logname, "w")
+
 
 ##############################################
 # manipulator
@@ -119,11 +128,13 @@ class TTDTuner(MeasurementInterface):
         print('ai name ->' + ai_name)
         self.handler.start_ai(ai_name, result_id, self.number_ais)
         res = self.handler.result(result_id)
-        sum = 0
-        for i in res:
-            sum += i
-        mean = float(sum)/len(res)
+        mean = float(sum(res))/len(res)
         self.builder.destroy(result_id)
+        logstr = "id = {}, result = {}".format(result_id, mean)
+        for k in cfg.keys():
+            logstr += ", {} = {}".format(k, cfg[k])
+        logstr += "\n"
+        self.logfile.write(logstr)
         return Result(time = -mean)
 
 ##############################################
@@ -132,6 +143,7 @@ class TTDTuner(MeasurementInterface):
 
     def save_final_config(self, configuration):
         self.handler.shutdown()
+        self.logfile.close()
         self.manipulator().save_to_file(configuration.data,
                                         'ttd_final_config.json')
 
