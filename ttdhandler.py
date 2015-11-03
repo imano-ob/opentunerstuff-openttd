@@ -135,7 +135,7 @@ class TTDHandler():
             cmd = "start_ai {}".format(ai)
             self.write_to_server(cmd)
             n -= 1
-        if self.started_ais < self.ais_per_round:
+ #       if self.started_ais < self.ais_per_round:
  #           self.add_ai_lock.release()    
 
 ################################################
