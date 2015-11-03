@@ -73,7 +73,7 @@ class AIBuilder:
                 func = 'AICompany.GetQuarterlyIncome(AICompany.COMPANY_SELF, AICompany.CURRENT_QUARTER) - AICompany.GetQuarterlyExpenses(AICompany.COMPANY_SELF, AICompany.CURRENT_QUARTER)'
 
 
-            out =  'AILog.Info("[tuner][" + ai_id + "][" + {} + "]");'.format(func)
+            out =  'AILog.Info("[tuner][" + ai_id + "][" + ({}) + "]");'.format(func)
 
             aux = 'AICompany.SetName("{}");\n'.format(ai_name)
             aux += 'local ai_id = {};\n'.format(ai_id)
