@@ -135,6 +135,8 @@ class TTDTuner(MeasurementInterface):
             logstr += ", {} = {}".format(k, cfg[k])
         logstr += "\n"
         self.logfile.write(logstr)
+	self.logfile.flush()
+        os.fsync(self.logfile.fileno())
         return Result(time = -mean)
 
 ##############################################

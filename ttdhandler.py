@@ -76,12 +76,13 @@ class TTDHandler():
             #construir exceção/retornar algo?
             raise
         if args == None:
-            dedicated_string = "-D :{}".format(port)
+            dedicated_string = "-D localhost:{}".format(port)
+            print dedicated_string
             args = [self.ttd_command,
                     dedicated_string,
                     "-G 1337",
-                    "-x"
-                    "-d script 5"]
+                    "-x",
+                    "-d script=5"]
             print "heyo"
             #para caso shell = True
        #     args = self.ttd_command + " -D -d script=5"
