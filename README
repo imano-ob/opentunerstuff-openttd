@@ -1,0 +1,16 @@
+
+Dependências: Python2 e OpenTuner. Em geral, instalar python2, python2-pip ou
+equivalente, e rodar pip (ou pip2 se o python padrão for o 3) install opentuner
+resolve.
+
+O OpenTuner tem um arquivo chamado adddeps.py, que fica na sua pasta utils.
+Copiar ou colocar um link simbólico desse arquivo aqui.
+
+Copiar o arquivo config.py.example com o nome config.py, e alterar seus valores
+para os correspondentes ao seu sistema. base_dir é o caminho pra IA base, a
+base_ai que está nesta pasta se você não quiser mudar. target_dir é a pasta de
+IAs do OpenTTD, provavelmente ~/.openttd/ai no linux ou (Pasta do usuário)\
+Documents\OpenTTD\ai no Windows.
+
+Falando em Windows, não testamos lá. Se você tentar e não funcionar, por favor
+avise em renanteruoc@gmail.com.
